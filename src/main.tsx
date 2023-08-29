@@ -1,5 +1,4 @@
 import {
-  DevLiveRefreshScript,
   whitesmokeInit,
   CssImports,
   getHashedPublicUrl,
@@ -9,10 +8,20 @@ import {
 import { Hono } from "hono";
 import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
+import {
+  DevLiveRefreshScript,
+  devSetup,
+  LIVE_REFRESH_PATH,
+  refreshMiddleware,
+} from "@whitesmokejs/dev";
+
+devSetup();
 
 const app = new Hono();
 
 whitesmokeInit({ app, importMeta: import.meta, serveStatic });
+
+app.use(LIVE_REFRESH_PATH, refreshMiddleware());
 
 app.get("*", async (c) => {
   const activePathData = await getMatchingPathData({ c });
