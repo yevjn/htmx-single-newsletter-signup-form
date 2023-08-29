@@ -1,3 +1,3 @@
-export default function () {
-  return <div style={{ color: "red" }}>Bob</div>;
+export default function Bob() {
+  return <div>Bob</div>;
 }
