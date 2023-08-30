@@ -4,24 +4,15 @@ import {
   getHashedPublicUrl,
   getMatchingPathData,
   Outlet,
+  whitesmokeDev,
 } from "whitesmoke";
 import { Hono } from "hono";
 import { serve } from "@hono/node-server";
 import { serveStatic } from "@hono/node-server/serve-static";
-import {
-  DevLiveRefreshScript,
-  devSetup,
-  LIVE_REFRESH_PATH,
-  refreshMiddleware,
-} from "@whitesmokejs/dev";
-
-devSetup();
 
 const app = new Hono();
 
 whitesmokeInit({ app, importMeta: import.meta, serveStatic });
-
-app.use(LIVE_REFRESH_PATH, refreshMiddleware());
 
 app.get("*", async (c) => {
   const activePathData = await getMatchingPathData({ c });
@@ -36,7 +27,7 @@ app.get("*", async (c) => {
           <meta charSet="UTF-8" />
           <meta name="viewport" content="width=device-width,initial-scale=1" />
 
-          <DevLiveRefreshScript />
+          {whitesmokeDev?.DevLiveRefreshScript()}
           <CssImports c={c} />
 
           <script
