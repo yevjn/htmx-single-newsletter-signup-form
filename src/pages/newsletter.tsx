@@ -1,4 +1,4 @@
-import { LoaderArgs, PageProps } from "whitesmoke";
+import type { ActionArgs, LoaderArgs, PageProps } from "whitesmoke";
 
 export function loader({ c }: LoaderArgs) {
   const { email } = c.req.query();
@@ -7,7 +7,7 @@ export function loader({ c }: LoaderArgs) {
   };
 }
 
-export async function action({ c }: LoaderArgs) {
+export async function action({ c }: ActionArgs) {
   await new Promise((res) => setTimeout(res, 1000));
   const formData = await c.req.formData();
   const email = formData.get("email") as string;
