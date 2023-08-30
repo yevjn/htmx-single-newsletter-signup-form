@@ -1,47 +1,54 @@
 import { LoaderArgs, PageProps } from "whitesmoke";
 
 export function loader(args: LoaderArgs) {
-  const { success, error, email } = args.c.req.query();
+  const { email } = args.c.req.query();
   return {
-    success: Boolean(success),
-    error: Boolean(error),
     email: email ? decodeURIComponent(email) : undefined,
   };
 }
 
-export default function Newsletter({ data }: PageProps<typeof loader>) {
-  const { success, error, email } = data;
+export async function action({ c }: LoaderArgs) {
+  await new Promise((res) => setTimeout(res, 1000));
+  const formData = await c.req.formData();
+  const email = formData.get("email") as string;
+  const isSuccess = Math.random() > 0.25;
+  return { email, success: isSuccess, error: !isSuccess };
+}
 
-  console.log({ data }); // this will only log on the server
-
+export default function Newsletter({
+  loaderData,
+  actionData,
+}: PageProps<typeof loader, typeof action>) {
+  const success = Boolean(actionData?.success);
+  console.log({ loaderData });
   return (
     <main>
       <form
-        hx-post="/newsletter-signup"
-        action="/newsletter-signup"
+        hx-post="/test/newsletter"
+        action="/test/newsletter"
         method="post"
         aria-hidden={success}
         hx-on={`htmx:beforeRequest:
-                    this.setAttribute('disabled', 'true');
-                    document.getElementById('subscribe').style.display='none';
-                    document.getElementById('subscribing').style.display='unset';`}
+                      this.setAttribute('disabled', 'true');
+                      document.getElementById('subscribe').style.display='none';
+                      document.getElementById('subscribing').style.display='unset';`}
       >
         <h2>Subscribe!</h2>
         <p>Don't miss any of the action!</p>
-        <fieldset disabled={Boolean(success)}>
+        <fieldset disabled={success}>
           <input
             id="email"
             required
-            value={email ?? ""}
+            value={actionData?.email ?? loaderData?.email ?? ""}
             aria-label="Email address"
             aria-describedby="error-message"
             type="email"
             name="email"
             placeholder="you@example.com"
-            autofocus={Boolean(email) && !success}
+            autofocus={Boolean(actionData?.email) && !success}
           />
 
-          {email && !success && !error && (
+          {loaderData?.email && (
             <script
               dangerouslySetInnerHTML={{
                 __html: 'document.getElementById("email").select()',
@@ -57,7 +64,9 @@ export default function Newsletter({ data }: PageProps<typeof loader>) {
           </button>
         </fieldset>
 
-        <p id="error-message">{error ? "Oops, we messed up!" : <>&nbsp;</>}</p>
+        <p id="error-message">
+          {actionData?.error ? "Oops, we messed up!" : <>&nbsp;</>}
+        </p>
       </form>
 
       <div aria-hidden={!success}>
@@ -65,7 +74,9 @@ export default function Newsletter({ data }: PageProps<typeof loader>) {
         <p>Please check your email to confirm your subscription.</p>
         <a
           href="/newsletter"
-          hx-get={`/newsletter?email=${email ? encodeURIComponent(email) : ""}`}
+          hx-get={`/newsletter?email=${
+            actionData?.email ? encodeURIComponent(actionData?.email) : ""
+          }`}
           tabindex={!success ? -1 : undefined}
         >
           Start over

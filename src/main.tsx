@@ -5,7 +5,6 @@ import {
   getMatchingPathData,
   Outlet,
   whitesmokeDev,
-  redirect,
 } from "whitesmoke";
 import { Hono } from "hono";
 import { serve } from "@hono/node-server";
@@ -15,21 +14,7 @@ const app = new Hono();
 
 whitesmokeInit({ app, importMeta: import.meta, serveStatic });
 
-app.post("/newsletter-signup", async (c) => {
-  await new Promise((res) => setTimeout(res, 1000));
-  const formData = await c.req.formData();
-  const email = formData.get("email") as string;
-  const isSuccess = Math.random() > 0.25;
-  console.log({ email, isSuccess });
-  return redirect({
-    c,
-    to: isSuccess
-      ? `/newsletter?success=true&email=${encodeURIComponent(email)}`
-      : `/newsletter?error=true&email=${encodeURIComponent(email)}`,
-  });
-});
-
-app.get("*", async (c) => {
+app.all("*", async (c) => {
   const activePathData = await getMatchingPathData({ c });
 
   if (activePathData.fetchResponse) return activePathData.fetchResponse;
@@ -57,7 +42,7 @@ app.get("*", async (c) => {
           <script
             type="module"
             dangerouslySetInnerHTML={{
-              __html: `import htmx from './${getHashedPublicUrl({
+              __html: `import htmx from '${getHashedPublicUrl({
                 c,
                 url: "public/vendor/htmx.mjs",
               })}'; window.htmx = htmx;`,
