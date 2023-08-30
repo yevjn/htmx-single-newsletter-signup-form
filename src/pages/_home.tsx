@@ -1,3 +1,15 @@
 export default function () {
-  return <div style={{ color: "red" }}>Bob</div>;
+  return (
+    <a
+      style={{
+        background: "white",
+        padding: "1rem",
+        borderRadius: "10px",
+        textDecoration: "none",
+      }}
+      href="/newsletter"
+    >
+      Sign up to newsletter
+    </a>
+  );
 }
