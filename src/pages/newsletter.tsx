@@ -16,19 +16,22 @@ export default function Newsletter({ data }: PageProps<typeof loader>) {
 
   return (
     <main>
-      <form hx-post="/newsletter-signup" aria-hidden={success}>
-        {email && !success && !error && (
-          <script
-            dangerouslySetInnerHTML={{
-              __html: 'document.getElementById("input").select()',
-            }}
-          />
-        )}
+      <form
+        hx-post="/newsletter-signup"
+        action="/newsletter-signup"
+        method="post"
+        aria-hidden={success}
+        hx-on={`htmx:beforeRequest:
+                    this.setAttribute('disabled', 'true');
+                    document.getElementById('subscribe').style.display='none';
+                    document.getElementById('subscribing').style.display='unset';`}
+      >
         <h2>Subscribe!</h2>
         <p>Don't miss any of the action!</p>
-        <fieldset>
+        <fieldset disabled={Boolean(success)}>
           <input
-            id="input"
+            id="email"
+            required
             value={email ?? ""}
             aria-label="Email address"
             aria-describedby="error-message"
@@ -37,10 +40,16 @@ export default function Newsletter({ data }: PageProps<typeof loader>) {
             placeholder="you@example.com"
             autofocus={Boolean(email) && !success}
           />
-          <button
-            type="submit"
-            onclick="document.getElementById('subscribe').remove();document.getElementById('subscribing').style.display='unset'"
-          >
+
+          {email && !success && !error && (
+            <script
+              dangerouslySetInnerHTML={{
+                __html: 'document.getElementById("email").select()',
+              }}
+            />
+          )}
+
+          <button type="submit">
             <span id="subscribe">Subscribe</span>
             <span id="subscribing" style={{ display: "none" }}>
               Subscribing!
@@ -52,13 +61,12 @@ export default function Newsletter({ data }: PageProps<typeof loader>) {
       </form>
 
       <div aria-hidden={!success}>
-        <h2 tabIndex={-1} autofocus={success}>
-          You're subscribed!
-        </h2>
+        <h2>You're subscribed!</h2>
         <p>Please check your email to confirm your subscription.</p>
         <a
           href="/newsletter"
           hx-get={`/newsletter?email=${email ? encodeURIComponent(email) : ""}`}
+          tabindex={!success ? -1 : undefined}
         >
           Start over
         </a>
