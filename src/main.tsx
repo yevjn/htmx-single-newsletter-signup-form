@@ -5,6 +5,7 @@ import {
   getMatchingPathData,
   Outlet,
   whitesmokeDev,
+  Htmx,
 } from "whitesmoke";
 import { Hono } from "hono";
 import { serve } from "@hono/node-server";
@@ -34,19 +35,11 @@ app.all("*", async (c) => {
           />
           <CssImports c={c} />
 
-          <script
-            type="module"
-            src={getHashedPublicUrl({ c, url: "public/vendor/htmx.mjs" })}
-          ></script>
-
-          <script
-            type="module"
-            dangerouslySetInnerHTML={{
-              __html: `import htmx from '${getHashedPublicUrl({
-                c,
-                url: "public/vendor/htmx.mjs",
-              })}'; window.htmx = htmx;`,
-            }}
+          <Htmx
+            location={getHashedPublicUrl({
+              c,
+              url: "public/vendor/htmx.mjs",
+            })}
           />
 
           <script
