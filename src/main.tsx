@@ -86,7 +86,7 @@ app.notFound((c) => {
   return c.text("404 Not Found", 404);
 });
 
-serve({ fetch: app.fetch, port: 8787 }, (info) => {
+serve({ fetch: app.fetch, port: 8788 }, (info) => {
   console.log(
     `\nListening on http://${
       process.env.NODE_ENV === "development" ? "localhost" : info.address

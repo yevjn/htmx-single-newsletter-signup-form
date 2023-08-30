@@ -1,7 +1,7 @@
 import { LoaderArgs, PageProps } from "whitesmoke";
 
-export function loader(args: LoaderArgs) {
-  const { email } = args.c.req.query();
+export function loader({ c }: LoaderArgs) {
+  const { email } = c.req.query();
   return {
     email: email ? decodeURIComponent(email) : undefined,
   };
@@ -20,18 +20,18 @@ export default function Newsletter({
   actionData,
 }: PageProps<typeof loader, typeof action>) {
   const success = Boolean(actionData?.success);
-  console.log({ loaderData });
+
   return (
     <main>
       <form
-        hx-post="/test/newsletter"
-        action="/test/newsletter"
+        action="/newsletter"
         method="post"
         aria-hidden={success}
         hx-on={`htmx:beforeRequest:
-                      this.setAttribute('disabled', 'true');
-                      document.getElementById('subscribe').style.display='none';
-                      document.getElementById('subscribing').style.display='unset';`}
+          this.setAttribute('disabled', 'true');
+          document.getElementById('subscribe').style.display='none';
+          document.getElementById('subscribing').style.display='unset';
+        `}
       >
         <h2>Subscribe!</h2>
         <p>Don't miss any of the action!</p>
