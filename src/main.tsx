@@ -36,10 +36,7 @@ app.all("*", async (c) => {
           <CssImports c={c} />
 
           <Htmx
-            location={getHashedPublicUrl({
-              c,
-              url: "public/vendor/htmx.mjs",
-            })}
+            location={getHashedPublicUrl({ c, url: "public/vendor/htmx.mjs" })}
           />
 
           <script
